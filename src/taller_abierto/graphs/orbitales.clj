@@ -1,10 +1,10 @@
 (ns taller-abierto.graphs.orbitales
   "El sample original puede ser `fuego`"
-  (:require [nanc-in-a-can.converge :refer [converge]]
-            [nanc-in-a-can.standard :refer [->xos dur->sec]]
-            [overtone.core :refer [metro-bpm]]
+  (:require [overtone.core :refer [metro-bpm]]
             [taller-abierto.instruments :as i]
-            [taller-abierto.synths.sample-players :refer [m-distort]]))
+            [taller-abierto.synths.sample-players :refer [m-distort]]
+            [time-time.converge :refer [converge]]
+            [time-time.standard :refer [->xos dur->sec]]))
 
 (def m-rand (memoize (fn [_] (rand))))
 (def m-rand2 (memoize rand))

@@ -1,8 +1,8 @@
 (ns taller-abierto.adorned-sample
-  (:require [nanc-in-a-can.converge :refer [converge]]
-            [overtone.core :as o]
+  (:require [overtone.core :as o]
             [taller-abierto.sample-canon :refer [sample-canon]]
-            [taller-abierto.synths.sample-players :refer [sbase]]))
+            [taller-abierto.synths.sample-players :refer [sbase]]
+            [time-time.converge :refer [converge]]))
 
 (defn adorned-sample
   [state base-sample canon-config chan]
