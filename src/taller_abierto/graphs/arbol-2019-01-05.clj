@@ -86,7 +86,7 @@
 (comment
   (require '[time-time.sequencing :refer [sequencer]])
   (def kick (o/freesound 2086))
-  (let [nome (metronome 120)]
+  (let [nome (o/metronome 120)]
     (->> (converge {:durs (repeat 10 1)
                     :tempos [7 5]
                     :cps [5]

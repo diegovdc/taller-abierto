@@ -46,4 +46,4 @@
 (def a10 (i-milo "10.aiff"))
 (def amix (i-milo "mix_1.aiff"))
 
-(def fuego-atardecer (load-sample* "/music/despertar__en-un-sitio-sagrado-/2018.11.13-atardecer/renders/fuegoatardecer.wav"))
+(def fuego-atardecer (load-sample* "/music/despertar__en-un-sitio-sagrado-/2018.11.13-atardecer/renders/fuego-atardecer.wav"))
