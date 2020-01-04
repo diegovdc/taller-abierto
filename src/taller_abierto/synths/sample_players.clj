@@ -1,7 +1,7 @@
 (ns taller-abierto.synths.sample-players
-  (:require [overtone.core :as o :refer :all]
-            [taller-abierto.instruments :as i]
-            [taller-abierto.standard :refer [*out-channels*]]))
+ (:require [overtone.core :as o :refer :all]
+           [taller-abierto.instruments :as i]
+           [taller-abierto.standard :refer [*out-channels*]]))
 
 (defsynth m-distort
   "Mono distorted synth that plays thin spectra slices"
@@ -35,9 +35,8 @@
 (defsynth sbase
   "Mono sample player"
   [sample i/silence
-   n-channels 1
    pan 1]
   (as-> sample sig
-    (o/play-buf:ar 1 sig)
-    (o/pan-az:ar *out-channels* sig pan)
-    (o/out 0 sig)))
+    (play-buf:ar 1 sig)
+    (pan-az:ar *out-channels* sig pan)
+    (out 0 sig)))
