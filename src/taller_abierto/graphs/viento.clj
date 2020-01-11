@@ -26,38 +26,26 @@
       (o/pan-az:ar *out-channels* sig pan)
       (* sig env amp)
       (o/out 0 sig))))
-(o/recording-start "~/Desktop/viento-autonomo.wav")
-(o/recording-stop)
+
 (defn synth*
   [& {:keys [vals metronome index start-pos sample pan amp]}]
-  #_(printing vals start-pos )
+  #_(println vals start-pos )
   (gas->crystal sample
-                :amp 0.5
+                :amp 1.2
                 :start-pos start-pos
                 :dur (:dur vals)
                 :rate (+ 0.6 (rand))))
 
-(def vision-total {:instruments [i/fuego-atardecer]
+(def vision-total {:instruments [i/a1]
                    :synth #'synth*})
 
 (def graph {#'vision-total #{#'vision-total}})
 
-(def xos (->xos "x"))
-
+(declare xos)
 (defonce state (atom {:history [] :xos #'xos}))
 (swap! state assoc :history [#'vision-total])
-(comment
-  (swap! state assoc :voicef true)
-  (swap! state assoc :playing-synths nil))
+(comment (swap! state assoc :voicef #{1}))
 
-(->> state deref :playing-synths (map o/node-active?))
-(-> state deref keys)
-(def a (gas->crystal i/fuego-atardecer :start-pos 20000000 :dur 20))
-(o/node-status a)
-
-(o/ctl a :pan 0)
-(o/kill)
-(o/stop)
 (defn mirror
   [xs]
   (concat xs (reverse xs)))
@@ -94,7 +82,11 @@
   (def viento (sample-canon state (canons 3)))
   (meta (canons 2)))
 
-(ctl-list state #(o/ctl (user/spy %) :amp 0))
+(def xos (->xos "x"))
+(ctl-list state #(o/ctl % :pan 1))
+(comment (require '[taller-abierto.sample-canon :refer [update-playing-synths]]))
+
+(->> @state :playing-synths count)
 
 (comment
   (require '[time-time.sequencing :refer [sequencer]])

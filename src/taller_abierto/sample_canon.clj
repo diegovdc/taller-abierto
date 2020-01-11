@@ -27,7 +27,7 @@
   `:playing-synths` may be used to apply `ctl` values to the synths"
   [derefed-state]
   (if (> (get-in derefed-state [:cleanup :newly-played-synths])
-         (get-in derefed-state [:cleanup :every] 5))
+         (get-in derefed-state [:cleanup :every] 100))
     (-> derefed-state (assoc :playing-synths
                              (filter (fn [s] (= :destroyed (node-status s)))
                                      (derefed-state :playing-synths)))
@@ -38,15 +38,12 @@
   [derefed-state synth]
   (-> derefed-state
       (update-in [:cleanup :newly-played-synths] #(inc (or % 0)))
-      ;; maybe-filter-freed-synths
+      maybe-filter-freed-synths
       (update :playing-synths conj synth)))
-(def at (atom nil))
-(-> at deref :playing-synths)
-(swap! at update-playing-synths 1)
 
 (defn ctl-list [state ctl-fn]
   (let [synths (@state :playing-synths)]
-    (with-inactive-node-modification-error :warning
+    (with-inactive-node-modification-error :silent
       (doseq [s synths] (ctl-fn s)))))
 
 (defn smpl-playa [vals index nome state sample-sequence pan]

@@ -1,8 +1,8 @@
 (ns taller-abierto.standard
   (:require [overtone.core :refer :all]))
 
-(def ^:dynamic *out-channels* 4)
-(-> *out-channels*)
+(def ^:dynamic *out-channels* 2)
+
 (defn ch
   "The different channels for a pan-az ugen"
   []
