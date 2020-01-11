@@ -6,4 +6,4 @@
   :jvm-opts ^:replace []
   :dependencies [[org.clojure/clojure "1.9.0"]
                  [time-time "0.1.0-SNAPSHOT"]
-                 [overtone "0.10.3"]])
+                 [overtone "0.10.6"]])

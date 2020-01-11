@@ -1,6 +1,6 @@
 (ns taller-abierto.graphs.viento
   (:require [overtone.core :as o]
-            [taller-abierto.sample-canon :refer [sample-canon]]
+            [taller-abierto.sample-canon :refer [sample-canon ctl-list]]
             [taller-abierto.instruments :as i]
             [taller-abierto.standard :refer [*out-channels*]]
             [time-time.converge :refer [converge]]
@@ -8,13 +8,14 @@
 
 (o/defsynth gas->crystal
   [sample i/silence
+   amp 1
    start-pos 0
    rate 1
    dur 20
    pan 1]
   (let [env (o/env-gen
              (o/envelope
-              [0 1 0.1 0]
+              [0 1 0]
               [20 dur 20]
               :lin)
              :action o/FREE)]
@@ -23,14 +24,15 @@
                      :start-pos start-pos
                      :rate rate)
       (o/pan-az:ar *out-channels* sig pan)
-      (* sig env 1.2)
+      (* sig env amp)
       (o/out 0 sig))))
 (o/recording-start "~/Desktop/viento-autonomo.wav")
 (o/recording-stop)
 (defn synth*
   [& {:keys [vals metronome index start-pos sample pan amp]}]
-  (println vals start-pos)
+  #_(printing vals start-pos )
   (gas->crystal sample
+                :amp 0.5
                 :start-pos start-pos
                 :dur (:dur vals)
                 :rate (+ 0.6 (rand))))
@@ -44,8 +46,18 @@
 
 (defonce state (atom {:history [] :xos #'xos}))
 (swap! state assoc :history [#'vision-total])
+(comment
+  (swap! state assoc :voicef true)
+  (swap! state assoc :playing-synths nil))
 
+(->> state deref :playing-synths (map o/node-active?))
+(-> state deref keys)
+(def a (gas->crystal i/fuego-atardecer :start-pos 20000000 :dur 20))
+(o/node-status a)
 
+(o/ctl a :pan 0)
+(o/kill)
+(o/stop)
 (defn mirror
   [xs]
   (concat xs (reverse xs)))
@@ -79,13 +91,15 @@
 (comment
   (g/play-next! state graph)
   (o/stop)
-  (def viento (sample-canon state (canons 3))))
-(meta (canons 2))
+  (def viento (sample-canon state (canons 3)))
+  (meta (canons 2)))
+
+(ctl-list state #(o/ctl (user/spy %) :amp 0))
 
 (comment
   (require '[time-time.sequencing :refer [sequencer]])
   (def kick (o/freesound 2086))
-  (let [nome (metronome 120)]
+  (let [nome (o/metronome 120)]
     (->> (converge {:durs (repeat 10 1)
                     :tempos [7 5]
                     :cps [5]

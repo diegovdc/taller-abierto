@@ -4,7 +4,9 @@
    [clojure.tools.namespace.repl :refer [set-refresh-dirs refresh refresh-all]]))
 
 (set-refresh-dirs "src" "test")
+
 (defn reset [] (refresh))
+
 (defn make-spy [printer]
   (fn [& args]
     (let [off (some #(= % :mute) args)
@@ -50,5 +52,9 @@
      (swap! data #(assoc % key val)))))
 
 (defn connect []
-  (eval '(do (require '[overtone.core :as o])
-             (o/boot-external-server))))
+  (eval '(do (require '[overtone.core :refer :all])
+             (boot-external-server))))
+
+(defn test-sound []
+  (eval '(do (require '[overtone.core :refer :all])
+             (demo (sin-osc 400)))))
