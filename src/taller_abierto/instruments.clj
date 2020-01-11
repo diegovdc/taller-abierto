@@ -47,3 +47,10 @@
 (def amix (i-milo "mix_1.aiff"))
 
 (def fuego-atardecer (load-sample* "/music/despertar__en-un-sitio-sagrado-/2018.11.13-atardecer/renders/fuego-atardecer.wav"))
+
+(def enlaces-organometalicos (i-milo "2/EnlacesOrganometalicos.wav"))
+(def enlaces-organometalicos-2 (i-milo "2/EnlacesOrganometalicos-2.wav"))
+(def escision (i-milo "2/Escision.wav"))
+(def interior-hidro-statica-dinamica (i-milo "2/InteriorHidrostaticaHidrodinamica.wav"))
+(def plectrum-interior (i-milo "2/PlectrumInterior.wav"))
+(def refraccion-difraccion (i-milo "2/RefraccionDifraccion.wav"))
