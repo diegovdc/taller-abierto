@@ -1,10 +1,11 @@
 (ns taller-abierto.standard
   (:require [overtone.core :refer :all]))
 
-(def ^:dynamic *out-channels* 2)
-
-(def ch
+(def ^:dynamic *out-channels* 4)
+(-> *out-channels*)
+(defn ch
   "The different channels for a pan-az ugen"
+  []
   (case *out-channels*
     2 {1 0.25
        2 0.75}
@@ -23,3 +24,5 @@
   (let [xos (var-get (@state :xos))
         len (count xos)]
     (nth xos (mod index len))))
+
+(defn mirror [xs] (concat xs (reverse xs)))

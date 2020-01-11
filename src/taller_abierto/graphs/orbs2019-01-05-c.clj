@@ -29,11 +29,11 @@
 (defn synth*
   [& {:keys [vals metronome index start-pos sample pan amp]}]
   #_(println vals start-pos)
-  (gas->crystal sample
-                :start-pos start-pos
-                :dur (:dur vals)
-                :rate (+ 0.6 (rand))
-                :pan (-> (ch) clojure.core/vals rand-nth user/spy)))
+  (user/spy (gas->crystal sample
+                          :start-pos start-pos
+                          :dur (:dur vals)
+                          :rate (+ 0.6 (rand))
+                          :pan (-> (ch) clojure.core/vals rand-nth user/spy))))
 
 (def vision-total {:instruments [i/fuego-atardecer]
                    :synth #'synth*})
@@ -72,6 +72,7 @@
                                :bpm 60})})
 
 (comment
+  (require '[taller-abierto.graphs.logic.core :as g])
   (alter-var-root #'*out-channels* (constantly 4))
   (identity *out-channels*)
   (g/play-next! state graph)
@@ -99,3 +100,49 @@
                             (kick)
                             nil)
                           {:repeat nil}))))))
+
+
+(comment
+  (def profundo
+    "Una sola gota, dentro del agua"
+    {:instruments [i/interior-hidro-statica-dinamica]
+     :synth #'synth*})
+
+  (def circular {:instruments [i/refraccion-difraccion]
+                 :synth #'synth*})
+
+  (def circular-escision {:instruments [i/escision i/refraccion-difraccion]
+                          :synth #'synth*})
+
+  (def escision {:instruments [i/escision]
+                 :synth #'synth*})
+
+  (def plectrum
+    "agudos, grillos"
+    {:instruments [i/plectrum-interior]
+     :synth #'synth*})
+
+  (def enlaces-organometalicos
+    "medios"
+    {:instruments [i/enlaces-organometalicos
+                   i/enlaces-organometalicos-2]
+     :synth #'synth*})
+
+  (def graph-1 {#'profundo #{#'circular}
+                #'circular #{#'circular-escision #'profundo #'escision}
+                #'circular-escision #{#'circular
+                                      #'escision
+                                      #'plectrum
+                                      #'enlaces-organometalicos}
+                #'escision #{#'enlaces-organometalicos}
+                #'plectrum #{#'circular #'profundo}
+                #'enlaces-organometalicos #{#'profundo}})
+
+  (def xos (->xos "xoooooooooooo"))
+
+
+  (defonce state-1 (atom {:history [] :xos #'xos}))
+
+  (g/play-next! state-1 graph-1)
+  (o/stop)
+  (def metal-tierra (sample-canon state-1 (canons 1))))
