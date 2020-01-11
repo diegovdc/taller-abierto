@@ -1,10 +1,10 @@
-(ns taller-abierto.graphs.viento
-  (:require [overtone.core :as o]
-            [taller-abierto.sample-canon :refer [sample-canon ctl-list]]
+(ns taller-abierto.graphs.bosque-nocturno-2019-11-01
+  (:require [overtone.core :as o :refer :all]
             [taller-abierto.instruments :as i]
-            [taller-abierto.standard :refer [*out-channels*]]
+            [taller-abierto.sample-canon :refer [ctl-list sample-canon]]
+            [taller-abierto.standard :refer [*out-channels* rrange +-]]
             [time-time.converge :refer [converge]]
-            [time-time.standard :refer [->xos dur->sec]]))
+            [time-time.standard :refer [->xos]]))
 
 (o/defsynth gas->crystal
   [sample i/silence
@@ -12,39 +12,50 @@
    start-pos 0
    rate 1
    dur 20
-   pan 1]
-  (let [env (o/env-gen
-             (o/envelope
-              [0 1 0]
-              [20 dur 20]
-              :lin)
-             :action o/FREE)]
+   pan 1
+   depth 0.2
+   bpf-start 10000
+   bpf-end 10000]
+  (let [env (o/env-gen (o/envelope [0 1 0] [1 dur 1] :lin) :action o/FREE)]
     (as-> sample sig
-      (o/play-buf:ar 1 sig
-                     :start-pos start-pos
-                     :rate rate)
+      (o/play-buf:ar 1 sig :start-pos start-pos :rate rate)
       (o/pan-az:ar *out-channels* sig pan)
+      (o/bpf:ar sig (o/env-gen (o/envelope [bpf-start bpf-end] [dur])) 0.3)
+      (o/free-verb:ar sig depth 0.5 0.3)
       (* sig env amp)
+      (o/distort sig)
+      (o/distort sig)
       (o/out 0 sig))))
+
+(gas->crystal i/a1 :bpf-start 200 :bpf-end 300 :start-at 88000 :amp 10)
 
 (defn synth*
   [& {:keys [vals metronome index start-pos sample pan amp]}]
-  #_(println vals start-pos )
-  (gas->crystal sample
-                :amp 1.2
-                :start-pos start-pos
-                :dur (:dur vals)
-                :rate (+ 0.6 (rand))))
+  (println index )
+  (let [r1 (rrange 5000 7000)
+        r2 (rrange 2000 10000)]
+    (gas->crystal sample
+                  :amp 100
+                  :depth 0.7
+                  :bpf-start (rand-nth [r1 r2])
+                  :bpf-end (rand-nth [r1 r2])
+                  :start-pos start-pos
+                  :dur (:dur vals)
+                  :rate (+- 1 (rand)))))
 
-(def vision-total {:instruments [i/a1]
-                   :synth #'synth*})
+(def insectos
+  "usar :voicef"
+  {:instruments [i/a1]
+   :synth #'synth*})
 
-(def graph {#'vision-total #{#'vision-total}})
+(def graph {#'insectos #{#'insectos}})
 
-(declare xos)
+
+(def xos (->xos "x"))
 (defonce state (atom {:history [] :xos #'xos}))
 (swap! state assoc :history [#'vision-total])
-(comment (swap! state assoc :voicef #{1}))
+(comment (swap! state assoc :voicef #{7 8 9 10 12 20 21}
+                ))
 
 (defn mirror [xs] (concat xs (reverse xs)))
 
@@ -69,7 +80,11 @@
                                      (map-indexed (fn [i v] (map #(+ % i) v)))
                                      flatten
                                      mirror)
-                          :tempos (->> [7 5] (repeat 20) flatten)
+                          :tempos (->> [70 50]
+                                       (repeat 21)
+                                       flatten
+                                       (map
+                                        #(+- % (rand-nth [1 2 3 10 30]))))
                           :cps [10 20 80 110 120 121 170 172 174 177 178]
                           :period (* 20 60)
                           :bpm 60})})

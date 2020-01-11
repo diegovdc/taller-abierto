@@ -24,3 +24,21 @@
   (stop)
   (node-pause* w1)
   (node-start* w2))
+
+
+(comment
+  (require '[time-time.sequencing :refer [sequencer]])
+  (def kick (freesound 2086))
+  (let [nome (metronome 120)]
+    (->> (converge {:durs (repeat 10 1)
+                    :tempos [7 5]
+                    :cps [5]
+                    :bpm 120
+                    :period 7})
+         (map (fn [voice] (sequencer
+                          nome
+                          voice
+                          (fn [vals index]
+                            (kick)
+                            nil)
+                          {:repeat nil}))))))

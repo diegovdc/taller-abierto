@@ -1,5 +1,4 @@
-(ns taller-abierto.standard
-  (:require [overtone.core :refer :all]))
+(ns taller-abierto.standard)
 
 (def ^:dynamic *out-channels* 2)
 
@@ -26,3 +25,12 @@
     (nth xos (mod index len))))
 
 (defn mirror [xs] (concat xs (reverse xs)))
+
+(defn rrange
+  "Random range"
+  [bottom top]
+  (-> (- top bottom)
+      rand-int
+      (+ bottom)))
+
+(defn +- [base n] (+ base (* (rand-nth [1 -1]) n)))
