@@ -33,6 +33,7 @@
   [& {:keys [vals metronome index start-pos sample pan amp]}]
   (let [r1 (rrange 5000 7000)
         r2 (rrange 2000 10000)]
+    (println index)
     (gas->crystal sample
                   :amp 100
                   :depth 0.7
@@ -50,7 +51,7 @@
 (def graph {#'insectos #{#'insectos}})
 
 
-(def xos (->xos "xooxo"))
+(def xos (->xos "x"))
 (defonce state (atom {:history [] :xos #'xos}))
 (swap! state assoc :history [#'insectos])
 (comment (swap! state assoc :voicef #{7 8 9 10 12 20 21}))
@@ -58,7 +59,8 @@
 
 (defn mirror [xs] (concat xs (reverse xs)))
 
-(def canons {1 (converge {:durs (->> [7 5 5 7 5 5]
+(def canons {1 (converge {:name :bosque-1
+                          :durs (->> [7 5 5 7 5 5]
                                      (repeat 2)
                                      flatten)
                           :tempos (->> [7 5] (repeat 10) flatten)
@@ -92,7 +94,7 @@
   (g/play-next! state graph)
   (o/stop)
   (def xos (->xos "x"))
-  (def viento (sample-canon state (canons 1)))
+  (def viento (sample-canon state (canons 2)))
   (meta (canons 2)))
 
 (comment (ctl-list state #(o/ctl % :pan 1)))

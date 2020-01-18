@@ -1,6 +1,8 @@
 (ns taller-abierto.sample-canon
   (:require
-   [overtone.core :refer [metronome node-status with-inactive-node-modification-error]]
+   [time-time.converge :refer [canon-dur]]
+   [visuals.durations :as v]
+   [overtone.core :refer [metronome metro-bpm node-status with-inactive-node-modification-error] :as o]
    [taller-abierto.instruments :as i]
    [taller-abierto.standard :refer [get-instruments get-synth xo-play?]]
    [time-time.sequencing :refer [sequencer]]
@@ -66,8 +68,21 @@
                                 :pan pan)
                {:data (assoc vals :index index)})))))
 
+(defn canon->visual-event
+  [nome canon]
+  (let [period (-> canon meta :period)]
+    (println period)
+    {:total-dur (-> (if period
+                      period
+                      (canon-dur canon (metro-bpm nome)))
+                    (* 1000)
+                    long)
+     :start-time (long (o/metro-beat nome (nome)))
+     :name (-> canon meta :name (or "unknown canon") str)}))
+
 (defn sample-canon
   [state canon & {:keys [pan nome] :or {pan 0 nome (metronome 60)}}]
+  (v/add-event! (canon->visual-event nome canon))
   (let [sample-sequence (atom {})]
     (->> canon
          (mapv (fn [voice]
@@ -82,3 +97,26 @@
                      state
                      sample-sequence
                      pan))))))))
+(require '[visuals.durations :as v])
+
+#_(add-event! {:total-dur 10000 :start-time (now) :name (str "canon " (rand-int 20)) })
+  (require '[time-time.converge :refer [canon-dur]])
+(comment
+
+  (do
+
+    (->> (converge {:name :bosque-1
+                    :durs (->> [7 5 5 7 5 5]
+                               (repeat 2)
+                               flatten)
+                    :tempos (->> [7 5] (repeat 10) flatten)
+                    :cps [10]
+                    :period (* 2 60)
+                    :bpm 60})
+         (canon->visual-event (metronome 120))
+         ;; v/add-event!
+         ))
+
+  (v/start-event-durations-gui)
+  (double (o/metro-beat n (n)))
+  (o/now))

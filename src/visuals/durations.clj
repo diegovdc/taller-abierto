@@ -130,7 +130,7 @@
     (dur-bar event)))
 
 
-(defn- start-event-durations-gui
+(defn start-event-durations-gui
   ([] (start-event-durations-gui []))
   ([events]
    {:pre [(validate ::input-events events)]}
