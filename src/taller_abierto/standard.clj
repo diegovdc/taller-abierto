@@ -1,6 +1,6 @@
 (ns taller-abierto.standard)
 
-(def ^:dynamic *out-channels* 2)
+(def ^:dynamic *out-channels* 4)
 
 (defn ch
   "The different channels for a pan-az ugen"

@@ -7,7 +7,7 @@
             [time-time.standard :refer [->xos]]))
 
 (o/defsynth gas->crystal
-  [sample i/silence
+  [sample i/a1
    amp 1
    start-pos 0
    rate 1
@@ -16,7 +16,7 @@
    depth 0.2
    bpf-start 10000
    bpf-end 10000]
-  (let [env (o/env-gen (o/envelope [0 1 0] [1 dur 1] :lin) :action o/FREE)]
+  (let [env (o/env-gen (o/envelope [0 1 1 0] [1 dur 1] :lin) :action o/FREE)]
     (as-> sample sig
       (o/play-buf:ar 1 sig :start-pos start-pos :rate rate)
       (o/pan-az:ar *out-channels* sig pan)
@@ -55,7 +55,6 @@
 (defonce state (atom {:history [] :xos #'xos}))
 (swap! state assoc :history [#'insectos])
 (comment (swap! state assoc :voicef #{7 8 9 10 12 20 21}))
-(comment (swap! state assoc :voicef true))
 
 (defn mirror [xs] (concat xs (reverse xs)))
 

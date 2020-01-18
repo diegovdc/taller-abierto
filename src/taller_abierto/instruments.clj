@@ -33,7 +33,7 @@
 (defonce orb1 (load-sample* "music/taller-abierto/sc/orbitales-canon-v1.2.wav"))
 (defonce orb2 (load-sample* "music/taller-abierto/sc/orbitales-canon-v2.palecs-2.wav"))
 
-(defonce silence (o/freesound-sample 459659))
+;; (defonce silence (o/freesound-sample 459659))
 (defonce a1 (i-milo "1.aiff"))
 (defonce a2 (i-milo "2.aiff"))
 (defonce a3 (i-milo "3.aiff"))
