@@ -7,7 +7,7 @@
             [time-time.standard :refer [->xos dur->sec]]))
 
 (o/defsynth gas->crystal
-  [sample i/silence
+  [sample i/a1
    amp 1
    start-pos 0
    rate 1
@@ -31,7 +31,7 @@
   [& {:keys [vals metronome index start-pos sample pan amp]}]
   #_(println vals start-pos )
   (gas->crystal sample
-                :amp 1.2
+                :amp 0.5
                 :start-pos start-pos
                 :dur (:dur vals)
                 :rate (+ 0.6 (rand))))

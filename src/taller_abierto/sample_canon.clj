@@ -48,7 +48,7 @@
 
 (defn smpl-playa [vals index nome state sample-sequence pan]
   (let [at-idx (get @sample-sequence index)
-        smpl (or (:smpl at-idx) (nthw (get-instruments state) index i/silence))
+        smpl (or (:smpl at-idx) (nthw (get-instruments state) index i/a1))
         start-pos (or (:start-pos at-idx) (rand-pos smpl))
         synth* (get-synth state)]
     (when (nil? at-idx)

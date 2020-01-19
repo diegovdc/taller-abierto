@@ -21,16 +21,17 @@
                (distort
                 (* amp ;; BEWARE!!!!!!!!!!!!!!!!!!!!!
                    (env-gen env :action FREE)
-                   (pan2 (bpf:ar
-                          (play-buf:ar 1 sample
-                                       :rate rate
-                                       :start-pos (min 0 (- (rand 1000) start-pos))
-                                       :loop (if (= sample i/silence)
-                                               false
-                                               true))
-                          bp-freq
-                          bp-q)
-                         pan)))))))
+                   (pan-az:ar *out-channels*
+                              (bpf:ar
+                               (play-buf:ar 1 sample
+                                            :rate rate
+                                            :start-pos (min 0 (- (rand 1000) start-pos))
+                                            :loop (if (= sample i/silence)
+                                                    false
+                                                    true))
+                               bp-freq
+                               bp-q)
+                              pan)))))))
 
 (defsynth sbase
   "Mono sample player"
