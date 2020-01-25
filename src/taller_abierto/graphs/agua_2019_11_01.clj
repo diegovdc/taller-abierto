@@ -28,12 +28,12 @@
       (o/out 0 sig))))
 
 (defn synth*
-  [& {:keys [vals metronome index start-pos sample pan amp]}]
-  #_(println vals start-pos )
+  [& {:keys [data metronome index start-pos sample pan amp]}]
+  #_(println data start-pos )
   (gas->crystal sample
                 :amp 1.2
                 :start-pos start-pos
-                :dur (:dur vals)
+                :dur (:dur data)
                 :rate (+ 0.6 (rand))))
 
 (def vision-total {:instruments [i/a1]
@@ -75,6 +75,9 @@
                           :bpm 60})})
 
 (comment
+  (require '[taller-abierto.graphs.specs :as gspecs]
+           '[clojure.spec.alpha :as s])
+  #_(s/explain ::gspecs/node* vision-total)
   (g/play-next! state graph)
   (o/stop)
   (def xos (->xos "x"))

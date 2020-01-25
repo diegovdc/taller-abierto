@@ -27,13 +27,13 @@
       (o/out 0 sig))))
 
 (defn synth*
-  [& {:keys [vals metronome index start-pos sample pan amp]}]
-  #_(println vals start-pos)
-  (user/spy (gas->crystal sample
-                          :start-pos start-pos
-                          :dur (:dur vals)
-                          :rate (+ 0.6 (rand))
-                          :pan (-> (ch) clojure.core/vals rand-nth user/spy))))
+  [& {:keys [data metronome index start-pos sample pan amp]}]
+  #_(println data start-pos)
+  (gas->crystal sample
+                :start-pos start-pos
+                :dur (:dur data)
+                :rate (+ 0.6 (rand))
+                :pan (-> (ch) vals rand-nth user/spy)))
 
 (def vision-total {:instruments [i/fuego-atardecer]
                    :synth #'synth*})
@@ -73,6 +73,8 @@
 
 (comment
   (require '[taller-abierto.graphs.logic.core :as g])
+  (require '[taller-abierto.graphs.specs :as gspecs]
+           '[clojure.spec.alpha :as s])
   (alter-var-root #'*out-channels* (constantly 4))
   (identity *out-channels*)
   (g/play-next! state graph)
@@ -145,4 +147,4 @@
 
   (g/play-next! state-1 graph-1)
   (o/stop)
-  (def metal-tierra (sample-canon state-1 (canons 1))))
+  (def metal-tierra (sample-canon state (canons 1))))

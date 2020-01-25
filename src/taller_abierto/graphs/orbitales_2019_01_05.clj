@@ -41,25 +41,25 @@
                               pan)))))))
 
 (defn synth*
-  [& {:keys [vals metronome index start-pos sample pan amp]}]
+  [& {:keys [data metronome index start-pos sample pan amp]}]
   (println "orbs" index)
   (m-distort sample
              :amp 40
-             :dur (* (rand 1) (dur->sec (:dur vals) (metro-bpm metronome)))
+             :dur (* (rand 1) (dur->sec (:dur data) (metro-bpm metronome)))
              :rate (rand-nth
                     [1
                      #_(+ 0.8
                         (* 0.2
                            (rand-nth [1 -1])
                            (rand)
-                           (m-rand2 (:tempo-index vals))))])
+                           (m-rand2 (:tempo-index data))))])
              :a (* 0.05 (rand 0.51))
              :r (rand-nth [(* 0.2 (rand 5))
                            #_(rand 10)])
              :bp-freq (+ 10 (rand-int 600))
              :bp-q (max 0.07 (rand 0.51))
              :start-pos start-pos
-             :pan (-> (ch) clojure.core/vals rand-nth)))
+             :pan (-> (ch) vals rand-nth)))
 (comment
   (require '[taller-abierto.sample-canon :refer [sample-canon]]
            '[taller-abierto.graphs.logic.core :as g])
@@ -133,12 +133,11 @@
 
 
 (comment
-  (alter-var-root #'*out-channels* (constantly 4))
   (require '[taller-abierto.sample-canon :refer [sample-canon]]
            '[taller-abierto.graphs.logic.core :as g])
-  (-> (g/play-next! state graph) :history last)
   (-> @state :history last)
   (def xos (->xos "xoooooooooooxxoooooooooxooooooooooooooo"))
   (def xos (->xos "x"))
+  (-> (g/play-next! state graph) :history last)
   (def orbitales (sample-canon state canon))
   (stop))

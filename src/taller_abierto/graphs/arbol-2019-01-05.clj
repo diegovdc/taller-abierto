@@ -27,13 +27,13 @@
       (o/out 0 sig))))
 
 (defn synth*
-  [& {:keys [vals metronome index start-pos sample pan amp]}]
-  #_(println vals start-pos)
+  [& {:keys [data metronome index start-pos sample pan amp]}]
+  (println "arbol" index)
   (gas->crystal sample
                 :start-pos start-pos
-                :dur (:dur vals)
+                :dur (:dur data)
                 :rate (+ 0.6 (rand))
-                :pan (-> (ch) clojure.core/vals rand-nth user/spy)))
+                :pan (-> (ch) vals rand-nth)))
 
 (def vision-total {:instruments [i/fuego-atardecer]
                    :synth #'synth*})

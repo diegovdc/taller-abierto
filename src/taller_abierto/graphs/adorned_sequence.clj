@@ -9,15 +9,15 @@
 
 (def m-rand2* (memoize rand))
 
-(defn synth* [& {:keys [vals metronome index start-pos sample pan]}]
+(defn synth* [& {:keys [data metronome index start-pos sample pan]}]
   (m-distort sample
-             :dur (* 0.1 (dur->sec (:dur vals) (o/metro-bpm metronome)))
+             :dur (* 0.1 (dur->sec (:dur data) (o/metro-bpm metronome)))
              :rate (rand-nth
                     [1
                      (+ 1.2
                         (* 0.2
                            (rand-nth [1 -1])
-                           (m-rand2* (:tempo-index vals))))])
+                           (m-rand2* (:tempo-index data))))])
              :out* 0
              :a (+ 0 (rand 2))
              :r (+ 0.7 (rand 0.5))

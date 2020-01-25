@@ -53,7 +53,10 @@
 
 (defn- validate-synth! [synth*]
   (when-not (s/valid? ::gspecs/synth synth*)
-    (println "Invalid synth:" synth* (s/explain-str ::gspecs/synth synth*))))
+    (throw (ex-info
+            "Invalid synth:"
+            {:synth synth*
+             :explanation (s/explain-str ::gspecs/synth synth*)}))))
 
 
 (defn smpl-playa [data index nome state sample-sequence pan]

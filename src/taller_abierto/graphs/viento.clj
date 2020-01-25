@@ -2,7 +2,7 @@
   (:require [overtone.core :as o]
             [taller-abierto.sample-canon :refer [sample-canon ctl-list]]
             [taller-abierto.instruments :as i]
-            [taller-abierto.standard :refer [*out-channels*]]
+            [taller-abierto.standard :refer [*out-channels* mirror]]
             [time-time.converge :refer [converge]]
             [time-time.standard :refer [->xos dur->sec]]))
 
@@ -28,12 +28,12 @@
       (o/out 0 sig))))
 
 (defn synth*
-  [& {:keys [vals metronome index start-pos sample pan amp]}]
-  #_(println vals start-pos )
+  [& {:keys [data metronome index start-pos sample pan amp]}]
+  #_(println data start-pos )
   (gas->crystal sample
                 :amp 1.2
                 :start-pos start-pos
-                :dur (:dur vals)
+                :dur (:dur data)
                 :rate (+ 0.6 (rand))))
 
 (def vision-total {:instruments [i/a1]
@@ -45,8 +45,6 @@
 (defonce state (atom {:history [] :xos #'xos}))
 (swap! state assoc :history [#'vision-total])
 (comment (swap! state assoc :voicef #{1}))
-
-(defn mirror [xs] (concat xs (reverse xs)))
 
 (def canons {1 (converge {:durs (->> [7 5 5 7 5 5]
                                      (repeat 2)

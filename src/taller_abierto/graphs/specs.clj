@@ -17,7 +17,8 @@
                              set (contains? :data))))
 
 (s/def ::params (s/and (comp atom? var-get) (comp map? deref var-get)))
-(s/def ::node* (s/keys :req-un [::instruments ::synth ::params]))
+(s/def ::node* (s/keys :req-un [::instruments ::synth]
+                       :opt-un [::params]))
 (s/def ::node (s/and var? #(s/valid? ::node* (var-get %))))
 (s/def ::edges (s/coll-of ::node))
 (s/def ::graph (s/map-of ::node ::edges ))

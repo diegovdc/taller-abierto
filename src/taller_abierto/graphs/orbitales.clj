@@ -10,16 +10,16 @@
 (def m-rand2 (memoize rand))
 
 (defn synth*
-  [& {:keys [vals metronome index start-pos sample pan amp]}]
+  [& {:keys [data metronome index start-pos sample pan amp]}]
   (m-distort sample
              :amp 15
-             :dur (* 0.1 (dur->sec (:dur vals) (metro-bpm metronome)))
+             :dur (* 0.1 (dur->sec (:dur data) (metro-bpm metronome)))
              :rate (rand-nth
                     [1
                      (+ 0.8
                         (* 0.2
                            (rand-nth [1 -1])
-                           (m-rand2 (:tempo-index vals))))])
+                           (m-rand2 (:tempo-index data))))])
              :a (+ 0 (rand 2))
              :r (+ 0.7 (rand 0.5))
              :bp-freq (+ 20 (rand-int 1600))
@@ -48,6 +48,10 @@
                       :tempos (map #(/ % 7) (range 7 15))
                       :cps [150]}))
 (comment
+  (require '[taller-abierto.sample-canon :refer [sample-canon]]
+           '[taller-abierto.graphs.logic.core :as g])
   (g/play-next! state graph)
-  (def orbitales (sample-canon (metronome 30) state canon))
+    (require '[taller-abierto.graphs.specs :as gspecs]
+             '[clojure.spec.alpha :as s])
+  (def orbitales (sample-canon state canon))
   (stop))
