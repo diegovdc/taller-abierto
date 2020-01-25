@@ -7,13 +7,15 @@
 ;;; graph
 (s/def ::instrument buffer?)
 (s/def ::instruments (s/* ::instrument))
-(s/def ::synth (s/and (comp fn? var-get)
+(s/def ::synth (s/and var?
+                      (comp fn? var-get)
                       #(-> %
-                           meta :arglists
-                           first        ;; &
-                           second :keys ;; optional arguments
-                           (->> (map keyword))
-                           set (contains? :data))))
+                             meta :arglists
+                             first            ;; &
+                             second :keys     ;; optional arguments
+                             (->> (map keyword))
+                             set (contains? :data))))
+
 (s/def ::params (s/and (comp atom? var-get) (comp map? deref var-get)))
 (s/def ::node* (s/keys :req-un [::instruments ::synth ::params]))
 (s/def ::node (s/and var? #(s/valid? ::node* (var-get %))))

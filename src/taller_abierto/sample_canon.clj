@@ -1,5 +1,6 @@
 (ns taller-abierto.sample-canon
   (:require
+   [clojure.spec.alpha :as s]
    [taller-abierto.graphs.specs :as gspecs]
    [taller-abierto.internal :refer [validate]]
    [time-time.converge :refer [canon-dur]]
@@ -50,12 +51,18 @@
     (with-inactive-node-modification-error :silent
       (doseq [s synths] (ctl-fn s)))))
 
+(defn- validate-synth! [synth*]
+  (when-not (s/valid? ::gspecs/synth synth*)
+    (println "Invalid synth:" synth* (s/explain-str ::gspecs/synth synth*))))
+
+
 (defn smpl-playa [data index nome state sample-sequence pan]
   (let [at-idx (get @sample-sequence index)
         smpl (or (:smpl at-idx)
                  (nthw (get-instruments state) index i/silence))
         start-pos (or (:start-pos at-idx) (rand-pos smpl))
         synth* (get-synth state)]
+    (validate-synth! synth*)
     (when (nil? at-idx)
       (swap! sample-sequence #(assoc % index {:start-pos start-pos
                                               :smpl smpl})))
