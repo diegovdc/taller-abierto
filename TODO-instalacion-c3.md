@@ -11,6 +11,9 @@
 [x] Agregar specs para grafos y estado
 [] Agregar función que explique parametros que se pasan a los synth*
 [] Mejorar specs para no requerir usar var-get o deref
+[] Inicialización en windows y linux
+[] Carga i/fuego-atardecer
+
 
 # Canones/graphos/synthdefs
 [] Flocking: usar transps (rate) para generar efectos de flocking donde diversas voces puedan ir modificando la manera en que se transporta un canon. Y para controlar paneos también.

@@ -55,3 +55,9 @@
 (defonce interior-hidro-statica-dinamica (i-milo "2/InteriorHidrostaticaHidrodinamica.wav"))
 (defonce plectrum-interior (i-milo "2/PlectrumInterior.wav"))
 (defonce refraccion-difraccion (i-milo "2/RefraccionDifraccion.wav"))
+
+(comment
+  (def m2-1 (i-milo "2-completo/1.wav"))
+  (def m2-2 (i-milo "2-completo/2.wav"))
+  (def m2-3 (i-milo "2-completo/3.wav"))
+  (def m2-4 (i-milo "2-completo/4.wav")))
