@@ -1,6 +1,6 @@
 (ns taller-abierto.standard)
 
-(def ^:dynamic *out-channels* 4)
+(def ^:dynamic *out-channels* 2)
 
 (defn ch
   "The different channels for a pan-az ugen"
@@ -13,16 +13,32 @@
        3 0.75
        4 1.25}))
 
+(defn get-last
+  "Get last node"
+  [state]
+  (-> @state :history last var-get))
+
 (defn get-instruments [state]
-  (-> @state :history last var-get :instruments))
+  (-> state get-last :instruments))
 
 (defn get-synth [state]
-  (-> @state :history last var-get :synth))
+  (-> state get-last :synth))
+
+(defn get-params [state]
+  (-> state get-last :params var-get deref))
+
+(defn param [state param not-found]
+  (let [param* (-> state get-params (get param not-found))]
+    (if (fn? param*)
+      (param* state)
+      param*)))
 
 (defn xo-play? [state index]
-  (let [xos (var-get (@state :xos))
+  (let [xos (try (var-get (@state :xos))
+                 (catch Exception _ nil))
         len (count xos)]
-    (nth xos (mod index len))))
+    (when xos
+      (nth xos (mod index len)))))
 
 (defn mirror [xs] (concat xs (reverse xs)))
 

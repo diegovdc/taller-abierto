@@ -2,11 +2,11 @@
   (:require [overtone.core :as o :refer :all]
             [taller-abierto.instruments :as i]
             [taller-abierto.sample-canon :refer [ctl-list sample-canon]]
-            [taller-abierto.standard :refer [*out-channels* rrange +-]]
+            [taller-abierto.standard :refer [*out-channels* rrange +- param]]
             [time-time.converge :refer [converge]]
             [time-time.standard :refer [->xos]]))
 
-(o/defsynth gas->crystal
+(o/defsynth bosque
   [sample i/a1
    amp 1
    start-pos 0
@@ -27,29 +27,34 @@
       (o/distort sig)
       (o/out 0 sig))))
 
-#_(gas->crystal i/a1 :bpf-start 200 :bpf-end 300 :start-at 88000 :amp 10)
+#_(bosque i/a1 :bpf-start 200 :bpf-end 300 :start-at 88000 :amp 10)
 
 (defn synth*
-  [& {:keys [vals metronome index start-pos sample pan amp]}]
+  [& {:keys [data metronome index start-pos sample pan amp state]}]
   (let [r1 (rrange 5000 7000)
-        r2 (rrange 2000 10000)]
-    (println index)
-    (gas->crystal sample
-                  :amp 100
-                  :depth 0.7
-                  :bpf-start (rand-nth [r1 r2])
-                  :bpf-end  (rand-nth [r1 r2])
-                  :start-pos start-pos
-                  :dur (:dur vals)
-                  :rate (+- 1 (rand)))))
+        r2 (rrange 2000 10000)
+        param* (partial param state)]
+    (println index "\n")
+    (bosque sample
+            :amp (param* :amp 100)
+            :depth 0.7
+            :bpf-start (rand-nth [r1 r2])
+            :bpf-end  (rand-nth [r1 r2])
+            :start-pos start-pos
+            :dur (:dur data)
+            :rate (+- 1 (rand)))))
+
+(def insectos-p
+  (atom {:amp 50
+         :pan 1}))
 
 (def insectos
   "usar :voicef"
   {:instruments [i/a1 i/a7]
-   :synth #'synth*})
+   :synth #'synth*
+   :params #'insectos-p})
 
 (def graph {#'insectos #{#'insectos}})
-
 
 (def xos (->xos "x"))
 (defonce state (atom {:history [] :xos #'xos}))
@@ -95,5 +100,3 @@
   (def xos (->xos "x"))
   (def viento (sample-canon state (canons 2)))
   (meta (canons 2)))
-
-(comment (ctl-list state #(o/ctl % :pan 1)))

@@ -1,5 +1,7 @@
 (ns taller-abierto.sample-canon
   (:require
+   [taller-abierto.graphs.specs :as gspecs]
+   [taller-abierto.internal :refer [validate]]
    [time-time.converge :refer [canon-dur]]
    [visuals.durations :as v]
    [overtone.core :refer [metronome metro-bpm node-status with-inactive-node-modification-error] :as o]
@@ -48,25 +50,27 @@
     (with-inactive-node-modification-error :silent
       (doseq [s synths] (ctl-fn s)))))
 
-(defn smpl-playa [vals index nome state sample-sequence pan]
+(defn smpl-playa [data index nome state sample-sequence pan]
   (let [at-idx (get @sample-sequence index)
-        smpl (or (:smpl at-idx) (nthw (get-instruments state) index i/silence))
+        smpl (or (:smpl at-idx)
+                 (nthw (get-instruments state) index i/silence))
         start-pos (or (:start-pos at-idx) (rand-pos smpl))
         synth* (get-synth state)]
     (when (nil? at-idx)
       (swap! sample-sequence #(assoc % index {:start-pos start-pos
                                               :smpl smpl})))
     (when (and
-           (voice-filter (@state :voicef) (vals :tempo-index))
+           (voice-filter (@state :voicef) (data :tempo-index))
            (xo-play? state index))
       (swap! state #'update-playing-synths
-             (with-meta (synth* :vals vals
+             (with-meta (synth* :data data
                                 :metronome nome
                                 :index index
                                 :sample smpl
                                 :start-pos start-pos
-                                :pan pan)
-               {:data (assoc vals :index index)})))))
+                                :pan pan
+                                :state state)
+               {:data (assoc data :index index)})))))
 
 (defn canon->visual-event
   [nome canon]
@@ -82,6 +86,7 @@
 
 (defn sample-canon
   [state canon & {:keys [pan nome] :or {pan 0 nome (metronome 60)}}]
+  {:pre [(validate ::gspecs/state state)]}
   (v/add-event! (canon->visual-event nome canon))
   (let [sample-sequence (atom {})]
     (->> canon
@@ -97,26 +102,28 @@
                      state
                      sample-sequence
                      pan))))))))
-(require '[visuals.durations :as v])
 
-#_(add-event! {:total-dur 10000 :start-time (now) :name (str "canon " (rand-int 20)) })
-  (require '[time-time.converge :refer [canon-dur]])
 (comment
+  (require '[visuals.durations :as v])
 
-  (do
+  #_(add-event! {:total-dur 10000 :start-time (now) :name (str "canon " (rand-int 20)) })
+  (require '[time-time.converge :refer [canon-dur]])
+  (comment
 
-    (->> (converge {:name :bosque-1
-                    :durs (->> [7 5 5 7 5 5]
-                               (repeat 2)
-                               flatten)
-                    :tempos (->> [7 5] (repeat 10) flatten)
-                    :cps [10]
-                    :period (* 2 60)
-                    :bpm 60})
-         (canon->visual-event (metronome 120))
-         ;; v/add-event!
-         ))
+    (do
 
-  (v/start-event-durations-gui)
-  (double (o/metro-beat n (n)))
-  (o/now))
+      (->> (converge {:name :bosque-1
+                      :durs (->> [7 5 5 7 5 5]
+                                 (repeat 2)
+                                 flatten)
+                      :tempos (->> [7 5] (repeat 10) flatten)
+                      :cps [10]
+                      :period (* 2 60)
+                      :bpm 60})
+           (canon->visual-event (metronome 120))
+           ;; v/add-event!
+           ))
+
+    (v/start-event-durations-gui)
+    (double (o/metro-beat n (n)))
+    (o/now)))
