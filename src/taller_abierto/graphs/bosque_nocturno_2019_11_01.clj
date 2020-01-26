@@ -27,18 +27,16 @@
       (o/distort sig)
       (o/out 0 sig))))
 
-(gas->crystal i/a1 :bpf-start 200 :bpf-end 300 :start-at 88000 :amp 10)
-(o/stop)
 (defn synth*
   [& {:keys [vals metronome index start-pos sample pan amp]}]
-  (println index )
-  (let [r1 (rrange 500 7000)
+  (let [r1 (rrange 5000 7000)
         r2 (rrange 2000 10000)]
+    (println index)
     (gas->crystal sample
                   :amp 30
                   :depth (rand)
                   :bpf-start (rand-nth [r1 r2])
-                  :bpf-end (rand-nth [r1 r2])
+                  :bpf-end  (rand-nth [r1 r2])
                   :start-pos start-pos
                   :dur (:dur vals)
                   :rate (+- 1 (rand))
@@ -46,7 +44,7 @@
 
 (def insectos
   "usar :voicef"
-  {:instruments [i/a1 i/fuego-atardecer]
+  {:instruments [i/a1 i/a7]
    :synth #'synth*})
 
 (def graph {#'insectos #{#'insectos}})
@@ -60,12 +58,13 @@
 
 (defn mirror [xs] (concat xs (reverse xs)))
 
-(def canons {1 (converge {:durs (->> [7 5 5 7 5 5]
+(def canons {1 (converge {:name :bosque-1
+                          :durs (->> [7 5 5 7 5 5]
                                      (repeat 2)
                                      flatten)
                           :tempos (->> [7 5] (repeat 10) flatten)
                           :cps [10]
-                          :period (* 5 60)
+                          :period (* 2 60)
                           :bpm 60})
              2  (converge {:durs (->> [7 5 5 7 5 5]
                                       (repeat 2)
@@ -108,7 +107,7 @@
 (comment
   (do
     (def milo
-      [(sample-on-channel i/m2-1 4 1.5 :start-at (* 44100 60 8))
-       (sample-on-channel i/m2-2 5 1.5 :start-at (* 44100 60 5))
-       (sample-on-channel i/m2-3 6 1.5 :start-at (* 44100 60 3))
-       (sample-on-channel i/m2-4 7 1.5 :start-at (* 44100 60 8))])))
+      [(sample-on-channel i/m2-1 4 1.5 )
+       (sample-on-channel i/m2-2 5 1.5 )
+       (sample-on-channel i/m2-3 6 1.5 )
+       (sample-on-channel i/m2-4 7 1.5 )])))

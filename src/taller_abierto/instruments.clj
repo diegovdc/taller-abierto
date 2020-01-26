@@ -33,7 +33,7 @@
 (defonce orb1 (load-sample* "music/taller-abierto/sc/orbitales-canon-v1.2.wav"))
 (defonce orb2 (load-sample* "music/taller-abierto/sc/orbitales-canon-v2.palecs-2.wav"))
 
-;; (defonce silence (o/freesound-sample 459659))
+(defonce silence (load-sample "resources/silence.wav"))
 (defonce a1 (i-milo "1.aiff"))
 (defonce a2 (i-milo "2.aiff"))
 (defonce a3 (i-milo "3.aiff"))
@@ -47,8 +47,7 @@
 (defonce amix (i-milo "mix_1.aiff"))
 
 (comment
-  (defonce fuego-atardecer (load-sample* "/music/despertar__en-un-sitio-sagrado-/2018.11.13-atardecer/renders/fuego-atardecer.wav"))
-  (demo 30 ay-buf:ar 2 fuego-atardecer :start-pos 20000))
+  (defonce fuego-atardecer (load-sample* "/music/despertar__en-un-sitio-sagrado-/2018.11.13-atardecer/renders/fuego-atardecer.wav")))
 
 (defonce enlaces-organometalicos (i-milo "2/EnlacesOrganometalicos.wav"))
 (defonce enlaces-organometalicos-2 (i-milo "2/EnlacesOrganometalicos-2.wav"))
@@ -58,7 +57,7 @@
 (defonce refraccion-difraccion (i-milo "2/RefraccionDifraccion.wav"))
 
 (comment
-  (defonce m2-1 (i-milo "2-completo/1.wav"))
-  (defonce m2-2 (i-milo "2-completo/2.wav"))
-  (defonce m2-3 (i-milo "2-completo/3.wav"))
-  (defonce m2-4 (i-milo "2-completo/4.wav")))
+  (def m2-1 (i-milo "2-completo/1.wav"))
+  (def m2-2 (i-milo "2-completo/2.wav"))
+  (def m2-3 (i-milo "2-completo/3.wav"))
+  (def m2-4 (i-milo "2-completo/4.wav")))
