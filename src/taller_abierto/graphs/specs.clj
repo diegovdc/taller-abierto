@@ -4,6 +4,17 @@
 
 (defn atom? [x] (instance? clojure.lang.IAtom x))
 
+;;; general
+(s/def ::amp number?)
+(s/def ::out number?)
+(s/def ::ch number?)
+(s/def ::sample buffer?)
+
+;;; static-samples-map
+(s/def ::static-samples-map
+  (s/map-of ::sample (s/keys :opt-un [::out ::amp])))
+
+
 ;;; graph
 (s/def ::instrument buffer?)
 (s/def ::instruments (s/* ::instrument))
