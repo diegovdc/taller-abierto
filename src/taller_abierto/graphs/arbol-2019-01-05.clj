@@ -1,4 +1,4 @@
-(ns taller-abierto.graphs.viento
+(ns taller-abierto.graphs.arbol-2019-01-05
   (:require [overtone.core :as o]
             [taller-abierto.instruments :as i]
             [taller-abierto.sample-canon :refer [sample-canon]]
