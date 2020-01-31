@@ -51,10 +51,25 @@
    (fn [val]
      (swap! data #(assoc % key val)))))
 
-(defn connect []
+(defn connect-linux []
   (eval '(do (require '[overtone.core :refer :all])
              (boot-external-server))))
+
+(defn connect-windows []
+  (eval '(do (require '[overtone.core :refer :all])
+             (connect-external-server))))
 
 (defn test-sound []
   (eval '(do (require '[overtone.core :refer :all])
              (demo (sin-osc 400)))))
+
+(def windows? (string/includes? (System/getProperty "os.name")
+                                "Windows"))
+
+(defonce do-connect! (future
+                       (Thread/sleep 5000)
+                       (println "[user/do-connect!] Starting overtone...")
+                       (if-not windows?
+                         (connect-linux)
+                         (connect-windows))
+                       (println :overtone-connected)))

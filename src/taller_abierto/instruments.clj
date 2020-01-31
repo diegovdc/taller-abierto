@@ -1,17 +1,14 @@
 (ns taller-abierto.instruments
   (:require [clojure.string :as string]
+            [user :refer [windows?]]
             [overtone.core :as o :refer :all]))
 
 (def ^:dynamic *drives* {:linux "/media/diego/Music/"
                          :windows "F:\\"})
 (defn load-sample* [path]
-  (let [windows? (string/includes? (System/getProperty "os.name")
-                                   "Windows")
-        drive (if windows? (*drives* :windows) (*drives* :linux))
+  (let [drive (if windows? (*drives* :windows) (*drives* :linux))
         path* (if windows? (string/replace (str drive path) #"/" "\\\\")
                   (str drive path))]
-    (when-not (or windows? (o/server-connected?))
-      (o/boot-external-server))
     (load-sample path*)))
 
 (defn sample-path [path]
