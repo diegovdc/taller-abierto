@@ -5,6 +5,7 @@
 
 (def ^:dynamic *drives* {:linux "/media/diego/Music/"
                          :windows "F:\\"})
+(println "Loading samples...")
 (defonce connect! (connect))
 (defn load-sample* [path]
   (let [drive (if windows? (*drives* :windows) (*drives* :linux))

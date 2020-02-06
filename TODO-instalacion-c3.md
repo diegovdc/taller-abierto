@@ -12,7 +12,7 @@
 [] Agregar función que explique parametros que se pasan a los synth*
 [] Mejorar specs para no requerir usar var-get o deref NOTE: parece que no puede ser hecho facilmente
 [x] Inicialización en windows y linux
-[] Carga i/fuego-atardecer
+[x] Carga i/fuego-atardecer
 
 
 # Canones/graphos/synthdefs

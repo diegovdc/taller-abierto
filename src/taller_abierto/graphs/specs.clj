@@ -38,7 +38,7 @@
 ;;; state
 (s/def ::history (s/coll-of ::node))
 (s/def ::xos (s/and var?
-                    #(s/valid? (s/coll-of boolean) (var-get %))))
+                    #(s/valid? (s/coll-of boolean?) (user/spy (var-get %)))))
 (s/def ::voicef (s/or ::fn fn?
                       ::set (s/and set? (s/coll-of int?))))
 (s/def ::state* (s/keys :req-un [::history] :opt-un [::xos ::voicef]))

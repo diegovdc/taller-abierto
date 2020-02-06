@@ -76,8 +76,7 @@
   (identity *out-channels*)
   (g/play-next! state graph)
   (o/stop)
-  (def viento (sample-canon state (canons 1)))
-  (o/recording-start "~/Desktop/viento-autonomo.wav")
+  (def viento (sample-canon state (canons 1)));;
   (o/recording-stop)
   (-> *out-channels*)
   (-> (ch))
