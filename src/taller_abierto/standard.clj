@@ -50,3 +50,7 @@
       (+ bottom)))
 
 (defn +- [base n] (+ base (* (rand-nth [1 -1]) n)))
+
+(defn x-rand [x min max]
+  (let [r (range min max)]
+    (map (fn [_] (rand-nth r)) (range x))))

@@ -4,6 +4,17 @@
 
 (defn atom? [x] (instance? clojure.lang.IAtom x))
 
+;;; general
+(s/def ::amp number?)
+(s/def ::out number?)
+(s/def ::ch number?)
+(s/def ::sample buffer?)
+
+;;; static-samples-map
+(s/def ::static-samples-map
+  (s/map-of ::sample (s/keys :opt-un [::out ::amp])))
+
+
 ;;; graph
 (s/def ::instrument buffer?)
 (s/def ::instruments (s/* ::instrument))
@@ -27,7 +38,7 @@
 ;;; state
 (s/def ::history (s/coll-of ::node))
 (s/def ::xos (s/and var?
-                    #(s/valid? (s/coll-of boolean) (var-get %))))
+                    #(s/valid? (s/coll-of boolean?) (user/spy (var-get %)))))
 (s/def ::voicef (s/or ::fn fn?
                       ::set (s/and set? (s/coll-of int?))))
 (s/def ::state* (s/keys :req-un [::history] :opt-un [::xos ::voicef]))

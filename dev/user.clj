@@ -1,7 +1,8 @@
 (ns user
-  (:require
-   [clojure.pprint]
-   [clojure.tools.namespace.repl :refer [set-refresh-dirs refresh refresh-all]]))
+  (:require clojure.pprint
+            [clojure.string :as string]
+            [clojure.tools.namespace.repl :refer [refresh set-refresh-dirs]]
+            [overtone.core :as o :refer :all]))
 
 (set-refresh-dirs "src" "test")
 
@@ -51,10 +52,13 @@
    (fn [val]
      (swap! data #(assoc % key val)))))
 
+(def windows? (string/includes? (System/getProperty "os.name")
+                                "Windows"))
 (defn connect []
-  (eval '(do (require '[overtone.core :refer :all])
-             (boot-external-server))))
+  (cond
+    (or (o/server-connected?) (o/server-connecting?)) :already-connected
+    windows? (o/connect-external-server)
+    :else (o/boot-external-server)))
 
 (defn test-sound []
-  (eval '(do (require '[overtone.core :refer :all])
-             (demo (sin-osc 400)))))
+  (demo (sin-osc 400)))

@@ -1,4 +1,4 @@
-(ns taller-abierto.graphs.viento
+(ns taller-abierto.graphs.arbol-2019-01-05
   (:require [overtone.core :as o]
             [taller-abierto.instruments :as i]
             [taller-abierto.sample-canon :refer [sample-canon]]
@@ -76,8 +76,7 @@
   (identity *out-channels*)
   (g/play-next! state graph)
   (o/stop)
-  (def viento (sample-canon state (canons 1)))
-  (o/recording-start "~/Desktop/viento-autonomo.wav")
+  (def viento (sample-canon state (canons 1)));;
   (o/recording-stop)
   (-> *out-channels*)
   (-> (ch))
