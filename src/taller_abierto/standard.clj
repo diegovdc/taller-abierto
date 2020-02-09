@@ -16,7 +16,7 @@
 (defn get-last
   "Get last node"
   [state]
-  (-> @state :history last var-get))
+  (-> state deref :history last var-get))
 
 (defn get-instruments [state]
   (-> state get-last :instruments))
@@ -25,13 +25,17 @@
   (-> state get-last :synth))
 
 (defn get-params [state]
-  (-> state get-last :params var-get deref))
+  (some-> state get-last :params var-get deref))
 
 (defn param [state param not-found]
   (let [param* (-> state get-params (get param not-found))]
     (if (fn? param*)
       (param* state)
       param*)))
+
+(defn node-name [state]
+  (-> state deref :history last meta :name str))
+
 
 (defn xo-play? [state index]
   (let [xos (try (var-get (@state :xos))

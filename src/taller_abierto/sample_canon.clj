@@ -72,15 +72,19 @@
     (when (and
            (voice-filter (@state :voicef) (data :tempo-index))
            (xo-play? state index))
-      (swap! state #'update-playing-synths
-             (with-meta (synth* :data data
-                                :metronome nome
-                                :index index
-                                :sample smpl
-                                :start-pos start-pos
-                                :pan pan
-                                :state state)
-               {:data (assoc data :index index)})))))
+      (let [synth-node (try (synth* :data data
+                                    :metronome nome
+                                    :index index
+                                    :sample smpl
+                                    :start-pos start-pos
+                                    :pan pan
+                                    :state state)
+                            (catch Exception e
+                              (println "sample-play synth* Exception" e)))]
+        (when synth-node
+         (swap! state #'update-playing-synths
+                (with-meta synth-node
+                  {:data (assoc data :index index)})))))))
 
 (defn canon->visual-event
   [nome canon]
