@@ -54,7 +54,11 @@
 
 (def windows? (string/includes? (System/getProperty "os.name")
                                 "Windows"))
-(defn connect []
+
+(def outs (atom 2))
+
+(defn connect [outs*]
+  (reset! outs outs*)
   (cond
     (or (o/server-connected?) (o/server-connecting?)) :already-connected
     windows? (o/connect-external-server)

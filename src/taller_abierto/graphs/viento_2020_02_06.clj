@@ -30,7 +30,7 @@
       (o/play-buf:ar 1 sig :start-pos start-pos :rate rate)
       (o/pan-az:ar *out-channels* sig pan)
       (o/bpf:ar sig (o/env-gen (o/envelope [bpf-start bpf-end] [(+ 3 dur)])) 0.7)
-      (* sig env amp (o/brown-noise:kr :mul 0.001))
+      (* sig env amp)
       #_(o/distort sig)
       (o/distort sig)
       (o/out 0 sig))))

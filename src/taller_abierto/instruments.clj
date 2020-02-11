@@ -6,7 +6,7 @@
 (def ^:dynamic *drives* {:linux "/media/diego/Music/"
                          :windows "F:\\"})
 (println "Loading samples...")
-(defonce connect! (connect))
+(defonce connect! (connect @user/outs))
 (defn load-sample* [path]
   (let [drive (if windows? (*drives* :windows) (*drives* :linux))
         path* (if windows? (string/replace (str drive path) #"/" "\\\\")
@@ -99,6 +99,16 @@
 
 
 (comment)
+(Thread/sleep 5000)
 (def fuego-atardecer (load-sample* "/music/despertar__en-un-sitio-sagrado-/2018.11.13-atardecer/renders/fuego-atardecer.wav"))
 
-(defonce all-samples-loaded? (do (println "All samples loaded!") true))
+(Thread/sleep 5000)
+(def fa-1 (i-milo "Fuego/fa1.wav"))
+(Thread/sleep 5000)
+(def fa-2 (i-milo "Fuego/fa2.wav"))
+(Thread/sleep 5000)
+(def fa-3 (i-milo "Fuego/fa3.wav"))
+(Thread/sleep 5000)
+(def fa-4 (i-milo "Fuego/fa4.wav"))
+
+(def all-samples-loaded? (do (println "All samples loaded!") true))

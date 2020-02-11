@@ -1,4 +1,4 @@
-(ns taller-abierto.play-static-samples
+ (ns taller-abierto.play-static-samples
   (:require [overtone.core :as o :refer [defsynth disk-in:ar]]
             [taller-abierto.instruments :as i]
             [taller-abierto.graphs.specs :as specs]
