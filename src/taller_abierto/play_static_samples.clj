@@ -11,8 +11,8 @@
   [static-samples-map]
   {:pre [(validate ::specs/static-samples-map static-samples-map)]}
   (->> static-samples-map
-       (map (fn [[sample config]]
-              (sample-on-channel
-               sample
-               (get config :out 0)
-               (get config :amp 1))))))
+       (mapv (fn [[sample config]]
+               (sample-on-channel
+                sample
+                (get config :out 0)
+                (get config :amp 1))))))
