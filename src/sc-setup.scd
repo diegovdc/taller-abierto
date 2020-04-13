@@ -10,7 +10,7 @@ Server.internal.options.numInputBusChannels = 4;
 s.boot;
 )
 
-a = {SinOsc.ar(E)}
+a = {SinOsc.ar()}
 a.play
 
 
