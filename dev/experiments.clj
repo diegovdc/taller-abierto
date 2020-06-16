@@ -42,3 +42,11 @@
                             (kick)
                             nil)
                           {:repeat nil}))))))
+
+
+(comment
+ ; SynthDef("s1", {Out.ar(99, SinOsc.ar()*0.2)}).add;
+
+
+  ;SynthDef(\m, {|amp = 1| Out.ar(0, amp * In.ar(99))}).add;
+)

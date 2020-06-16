@@ -58,3 +58,6 @@
 (defn x-rand [x min max]
   (let [r (range min max)]
     (map (fn [_] (rand-nth r)) (range x))))
+
+(defn wrap-at [i coll]
+  (nth coll (mod i (count coll))))

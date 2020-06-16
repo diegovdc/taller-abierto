@@ -6,5 +6,6 @@
   :jvm-opts ^:replace []
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [time-time "0.1.0-SNAPSHOT"]
+                 [org.clojure/core.async "1.2.603"]
                  [overtone "0.10.6"]
                  [quil "3.1.0"]])

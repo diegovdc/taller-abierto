@@ -1,8 +1,12 @@
 (ns user
-  (:require clojure.pprint
+  (:require [clojure.pprint]
             [clojure.string :as string]
             [clojure.tools.namespace.repl :refer [refresh set-refresh-dirs]]
-            [overtone.core :as o :refer :all]))
+            [overtone.core :as o :refer :all]
+            [clojure.java.io :as io])
+  (:import [java.time LocalDateTime]
+           [java.util Date]
+           [java.text SimpleDateFormat]))
 
 (set-refresh-dirs "src" "test")
 
@@ -66,3 +70,23 @@
 
 (defn test-sound []
   (demo (sin-osc 400)))
+
+(def ^:dynamic *drives* {:linux "/media/diego/Music/"
+                         :windows "F:\\"})
+
+(defn make-path [path]
+  (let [drive (if windows? (*drives* :windows) (*drives* :linux))]
+    (if windows? (string/replace (str drive path) #"/" "\\\\")
+        (str drive path))))
+
+(defn iso-now []
+  (.format (SimpleDateFormat. "yyyy-MM-dd'T'HH_mm_ss")
+           (Date.)))
+
+(defn rec [dir]
+  (let [path (make-path (str "music/taller-abierto/sc/" dir "/" (iso-now) ".wav"))]
+    (io/make-parents path)
+    (println "Recording on:" path)
+    (o/recording-start path)))
+
+(defn stop-rec [] (o/recording-stop))
