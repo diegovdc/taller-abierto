@@ -10,7 +10,7 @@ Server.internal.options.numInputBusChannels = 4;
 s.boot;
 )
 
-a = {SinOsc.ar()}
+a = {SinOsc.ar()*0.02}
 a.play
 
 
@@ -23,6 +23,6 @@ a.play
         level: 0.5,
         width: 3,
         orientation: 0.5
-    );
-}.scope
+    )*0.2;
+}.play
 )

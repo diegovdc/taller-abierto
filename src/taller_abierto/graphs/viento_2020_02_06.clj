@@ -5,7 +5,12 @@
             [scratch :refer [flocking]]
             [taller-abierto.instruments :as i]
             [taller-abierto.sample-canon :refer [ctl-list sample-canon]]
-            [taller-abierto.standard :refer [*out-channels* +- mirror x-rand]]
+            [taller-abierto.standard :refer [*out-channels*
+                                             +-
+                                             mirror
+                                             x-rand
+                                             param
+                                             node-name]]
             [time-time.converge :refer [converge]]))
 
 (o/defsynth gas->crystal
@@ -19,14 +24,13 @@
    depth 0.8
    bpf-start 10000
    bpf-end 10000]
-  (let [env (o/env-gen (o/envelope [0 0.7 0.6 0] [2 dur 2] :lin)
+  (let [env (o/env-gen (o/envelope [0 0.7 0.6 0] [5 dur 2] :lin)
                        :action o/FREE)]
     (as-> sample sig
       (o/play-buf:ar 1 sig :start-pos start-pos :rate rate)
       (o/pan-az:ar *out-channels* sig pan)
       (o/bpf:ar sig (o/env-gen (o/envelope [bpf-start bpf-end] [(+ 3 dur)])) 0.7)
-      #_(o/free-verb:ar sig depth 0.51 0.2)
-      (* sig env amp (o/brown-noise))
+      (* sig env amp)
       #_(o/distort sig)
       (o/distort sig)
       (o/out 0 sig))))
@@ -42,48 +46,56 @@
 ;; viento alto 170-580 hz
 ;; viento bosque 8000-8500hz
 (defn synth*
-  [& {:keys [data index start-pos sample pan amp]}]
-  (let [offset (* 5 (:tempo-index data))
-        {:keys [params]}
+  [& {:keys [data index start-pos sample pan amp state]}]
+  (let [base-amp (param state :base-amp 0.3)
+        low-band (param state :low-band 170)
+        density (param state :density 1)
+        high-band (param state :high-band 380)
+        offset (* 5 (:tempo-index data))
+        {{:keys [rate pan amp bpf-start bpf-end start-pos]} :params}
         (flocking {:flocking/index-mode :total
                    :rate {:init 1 :f (l-coord :x 0.5 1.2 offset)}
-                   :pan {:init 1 :f (l-coord :x 0.5 1.5 (data :tempo-index))}
-                   :amp {:init 0.01 :f (l-coord :y 0 0.2 offset)}
-                   :bpf-start {:init 20 :f (l-coord :z 170 580 offset)}
-                   :bpf-end {:init 20 :f (l-coord :z 170 580 (+ 100 offset))}
-                   :start-pos {:init 20 :f (l-coord :z 170 (-> sample :n-samples) (inc offset))}
-                   :mod {:init 20 :f (l-coord :y -200 500 offset) }}
+                   :pan {:init 1 :f (l-coord :x -0.25 1.5 (data :tempo-index))}
+                   :amp {:init 0.01 :f (l-coord :y 0 1 offset)}
+                   :bpf-start {:init 20 :f (l-coord :z low-band high-band offset)}
+                   :bpf-end {:init 20
+                             :f (l-coord :z low-band high-band (+ 100 offset))}
+                   :start-pos {:init 20
+                               :f (l-coord :z 0 (-> sample :n-samples) (inc offset))}}
                   flock-state
                   index)]
-    (gas->crystal sample
-                  :mod- (max 0 (params :mod))
-                  :amp (* 0.1 (params :amp))
-                  :start-pos (int (params :start-pos))
-                  :dur (/ (:dur data) 2)
-                  :bpf-end (params :bpf-end)
-                  :bpf-start (params :bpf-start)
-                  :pan (:pan params)
-                  :rate (:rate params))))
-(type (->  i/a1 :n-samples))
-(def vision-total {:instruments [i/fuego-atardecer]
-                   :synth #'synth*})
-
-(def particulas {:instruments [i/rebotes i/orb1]
-                 :synth #'synth*})
+    (when (>= density (rand))
+      (println "viento:" (node-name state))
+      (gas->crystal sample
+                    :amp (* base-amp amp)
+                    :start-pos (int start-pos)
+                    :dur (/ (:dur data) 2)
+                    :bpf-end bpf-end
+                    :bpf-start bpf-start
+                    :pan pan
+                    :rate rate))))
 
 
-(def graph {#'vision-total #{#'vision-total}
-            #'particulas #{#'particulas}})
+(def params** (atom {:low-band 100 :high-band 8000 :base-amp 1 :density 0.3}))
+(def dentro-del-bosque {:instruments [i/rebotes i/refraccion-difraccion]
+                        :synth #'synth*
+                        :params #'params**})
+
+(def params* (atom {:low-band 270 :high-band 380 :base-amp 0.1 :density 0.7}))
+(def sobre-el-bosque {:instruments [i/rebotes i/orb1]
+                      :synth #'synth*
+                      :params #'params*})
+
+(def graph {#'dentro-del-bosque #{#'sobre-el-bosque}
+            #'sobre-el-bosque #{#'dentro-del-bosque}})
 
 (declare xos)
 (defonce state (atom {:history [] :xos #'xos}))
-(swap! state assoc :history [#'particulas])
+(swap! state assoc :history [#'sobre-el-bosque])
 (comment (swap! state assoc :voicef (set (range 10 20)))
          (swap! state assoc :voicef true))
 
-(def canons {1 (converge {:durs (->>
-                                 (repeat 5000 2)
-                                 flatten)
+(def canons {1 (converge {:durs (repeat 2500 2)
                           :tempos (->> (x-rand 10 10 30))
                           :period (* 20 60)
                           :cp (x-rand 5 20 5000)
@@ -98,20 +110,21 @@
                            :period (* 10 60)
                            :bpm 60})
              :grillos-intenso (converge {:durs (->> [7 5 3 13 12 9 1]
-                                     (repeat 20)
-                                     (map-indexed (fn [i v] (map #(+ % i) v)))
-                                     flatten
-                                     mirror)
-                          :tempos (->> [7 5 9 13] (repeat 20) flatten
-                                       (map #(+- % (rand-int 5))))
-                          :cps [10 20 80 110 120 121 ]
-                          :period (* 20 60)
+                                                    (repeat 20)
+                                                    (map-indexed (fn [i v] (map #(+ % i) v)))
+                                                    flatten
+                                                    mirror)
+                                         :tempos (->> [7 5 9 13] (repeat 20) flatten
+                                                      (map #(+- % (rand-int 5))))
+                                         :cps [10 20 80 110 120 121 ]
+                                         :period (* 20 60)
                                          :bpm 60})})
 
 (comment
-  (g/play-next! state graph)
+  (require '[taller-abierto.graphs.logic.core :as g])
+  (do (g/play-next! state graph) :true)
   (o/stop)
-  (def xos (shuffle (concat (repeat 100 true) (repeat 500 false))))
+  (def xos (shuffle (concat (repeat 100 true) (repeat 150 false))))
   (def viento (sample-canon state (canons 1)))
   (meta (canons 2)))
 

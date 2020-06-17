@@ -114,7 +114,7 @@
                          :points (conj points [x y z])})))))
 
   (q/defsketch lorentz
-    :size [1000 1000]
+    :size [500 500]
     :renderer :p3d
     :setup setup
     :draw draw))

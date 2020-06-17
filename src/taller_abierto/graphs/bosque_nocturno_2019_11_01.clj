@@ -94,11 +94,15 @@
                           :period (* 20 60)
                           :bpm 60})})
 
+
+(defn play! [canon-num]
+  (sample-canon state (canons canon-num)))
+
 (comment
   (g/play-next! state graph)
   (o/stop)
   (def xos (->xos "x"))
-  (def bosque-nocturno (sample-canon state (canons 3)))
+  (def bosque-nocturno (sample-canon state (canons 1)))
   (meta (canons 2)))
 
 
