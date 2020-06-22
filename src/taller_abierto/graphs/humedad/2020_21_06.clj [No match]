@@ -1,0 +1,177 @@
+(ns taller-abierto.graphs.humedad.2020-06-21
+  (:require [overtone.core :as o]
+            [taller-abierto.fader :refer [make-fader]]
+            [taller-abierto.instruments :as i]
+            [taller-abierto.sample-canon :refer [sample-canon]]
+            [taller-abierto.standard :refer [*out-channels* ch wrap-at]]
+            [taoensso.timbre :as log]
+            [time-time.converge :refer [converge]]
+            [time-time.standard :refer [->xos]]
+            [taller-abierto.attractors.lorentz :as lorentz]
+            [quil.core :as q]
+            [clojure.core.async :as a]))
+
+
+(defn rotate
+  "Take a collection and left rotates it n steps. If n is negative,
+the
+collection is rotated right. Executes in O(n) time."
+  [n coll]
+  (let [c (count coll)]
+    (take c (drop (mod n c) (cycle coll)))))
+
+(defn run-ctl [ctl-fn]
+  (let [stop-chan (a/chan)]
+    (a/go-loop [i 0]
+      (a/alt!
+        (a/timeout (+ 200))
+        (do (a/thread (ctl-fn i))
+            (recur (inc i)))
+        stop-chan (prn "stopping...")))
+    #(a/>!! stop-chan true)))
+
+(comment
+  (def humedad (sample-canon state (canons 1)))
+  (o/stop))
+
+(o/defsynth gas->crystal
+  [sample i/silence start-pos 0 rate 1
+   amp 1.2 dur 20
+   bpf 500 rq 1
+   room 1
+   pan 0 out 0]
+  (let [env (o/env-gen
+             (o/envelope
+              [0 0.7 0.5 1 0.3 0]
+              [2 (/ dur 3) (/ dur 3) (/ dur 3) 4]
+              :lin)
+             :action o/FREE)]
+    (as-> sample sig
+      (o/play-buf:ar 2 sig :start-pos start-pos :rate rate)
+      (o/mix:ar sig)
+      (o/pan2:ar sig pan)
+      (o/bpf sig bpf rq)
+      (o/free-verb sig 0.5 room)
+      #_(o/pan-az:ar *out-channels* sig pan)
+      (* 3 sig env amp)
+      (o/distort sig)
+      (o/out out sig))))
+
+(def voices (atom {}))
+(deref voices)
+(def lor (lorentz/init-system))
+(def lor-state (atom {}))
+(deref lor-state)
+(defn dissoc-voice [voices voice-index synth]
+  #_(println "dissoc'ing...")
+  (if (-> voices (get voice-index) :synth (= synth))
+    (dissoc voices voice-index)
+    voices))
+
+(defn ctl-voice [lorentz-index voices [voice-index {:keys [index synth]}]]
+  #_(prn "g")
+  (try
+    (let [l-val (lor (+ index lorentz-index))
+          [x y z] (rotate voice-index [:x :y :z])]
+      (o/ctl synth :amp (lorentz/bound l-val x 4 8))
+      (o/ctl synth :bpf (lorentz/bound l-val y 30 4000))
+      (o/ctl synth :rq (lorentz/bound l-val z 0.1 0.3)
+             (o/ctl synth :room (lorentz/bound l-val z 0 1)))
+      #_(o/ctl synth :rate (lorentz/bound l-val z 0.3 2))
+      (o/ctl synth :pan (lorentz/bound l-val :x -1 1))
+      (swap! lor-state assoc voice-index (assoc l-val :x x :y y :z z)))
+    (catch Exception e  (do #_(-> e Throwable->map :cause println)
+                            (swap! voices dissoc-voice voice-index synth)))))
+(comment
+  (def ctls (run-ctl
+             (fn [i]
+               (doseq [voice @voices]
+                 (ctl-voice i voices voice)))))
+
+  (ctls))
+
+(defn synth*
+  [& {:keys [data metronome index start-pos sample pan amp]}]
+  (try
+    (let [growth (mod index 20)
+          {:keys [x y z] :as l} (get @lor-state (:tempo-index data))]
+      (when (< (/ growth 20) (rand))
+        (log/info "humedad" (str "v" (:tempo-index data)) (str "i:" index))
+        (let [synth** (gas->crystal sample
+                                    :amp (if l
+                                           (lorentz/bound l x 0 2)
+                                           (* 0.3 (+ 0.3 (rand))))
+                                    :room (if l (lorentz/bound l z 0 1) 0.5)
+                                    :start-pos start-pos
+                                    :bpf (if l (lorentz/bound l y 30 4000) 1000)
+                                    :rq (+ 0.1)
+                                    :dur (* 1/5 (:dur data) growth)
+                                    :rate (+ 0.1 (rand 0.4))
+                                    :pan (-> (ch) vals rand-nth)
+                                    :out 0)]
+          (when (:tempo-index data)
+            (swap! voices assoc (:tempo-index data) {:index index :synth synth**}))
+          synth**)))
+    (catch Exception e (println e))))
+
+(def white-perc-spaced i/humedad-2)
+(def scratch-and-lows i/humedad-3)
+(def scratch-and-lows-2 i/humedad-4)
+(def silent-little i/humedad-5)
+(def perc-drops i/humedad-6)
+
+(defn fib
+  ([n] (fib n 1))
+  ([n seed]
+   (loop [fibs [seed seed]]
+     (if (= (count fibs) n)
+       fibs
+       (recur (conj fibs (apply + (take-last 2 fibs))))))))
+(->> (fib 100 1/10) (take-last 40) reverse)
+
+(def vision-total {:instruments [i/humedad-1
+                                 white-perc-spaced
+                                 perc-drops
+                                 silent-little
+                                 scratch-and-lows
+                                 scratch-and-lows-2]
+                   :synth #'synth*})
+
+(def a {:instruments [i/humedad-1 silent-little scratch-and-lows] :synth #'synth*})
+(def b {:instruments [white-perc-spaced perc-drops] :synth #'synth*})
+
+(def graph {#'a #{#'a}})
+(def xos (->xos "x"))
+
+(defonce state (atom {:history [] :xos #'xos}))
+(swap! state assoc :history [#'vision-total])
+(swap! state assoc :history [#'a])
+(swap! state assoc :history [#'b])
+
+(defn make-durs [quantity lorentz-index-offset lorentz-index-step min-dur max-dur]
+  (->> (range lorentz-index-offset
+              (+ lorentz-index-offset (* quantity lorentz-index-step))
+              lorentz-index-step)
+       (map (comp first :point lor))
+       ((fn [x-points]
+          (let [min* (apply min x-points)
+                max* (apply max x-points)]
+            (map #(q/map-range % min* max* min-dur max-dur) x-points))))))
+
+(def canons {1 (converge {:durs (make-durs 34 180 5 5 10)
+                          :tempos (range 11 20)
+                          :cps [30]
+                          :period (* 5 60)
+                          :bpm 60})
+             2 (converge {:durs (make-durs 200 180 5 5 10)
+                          :tempos (->> (range 11 17))
+                          :cps [10 30 66 89 110 139]
+                          :period (* 15 60)
+                          :bpm 60})})
+
+(comment
+  (def humedad (sample-canon state (canons 2)))
+  (def amp* 2)
+  (user/rec "humedad_2020_06_21")
+  (user/stop-rec)
+  (o/stop))

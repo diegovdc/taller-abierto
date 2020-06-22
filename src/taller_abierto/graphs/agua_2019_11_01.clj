@@ -77,7 +77,7 @@
 (comment
   (require '[taller-abierto.graphs.specs :as gspecs]
            '[clojure.spec.alpha :as s])
-  #_(s/explain ::gspecs/node* vision-total)
+  ;; (s/explain ::gspecs/node* vision-total)
   (g/play-next! state graph)
   (o/stop)
   (def xos (->xos "x"))

@@ -2,6 +2,7 @@
   (:require [clojure.pprint]
             [clojure.string :as string]
             [clojure.tools.namespace.repl :refer [refresh set-refresh-dirs]]
+            [taoensso.timbre :as log]
             [overtone.core :as o :refer :all]
             [clojure.java.io :as io])
   (:import [java.time LocalDateTime]
@@ -89,4 +90,19 @@
     (println "Recording on:" path)
     (o/recording-start path)))
 
-(defn stop-rec [] (o/recording-stop))
+(defn stop-rec [] (println (o/recording-stop)))
+
+
+;; Logger config
+(log/merge-config!
+ {:output-fn
+  (fn [data]
+    (let [{:keys [level ?err vargs msg_
+                  ?ns-str ?file hostname_
+                  timestamp_ ?line]} data]
+
+      (str "[" (or ?ns-str ?file "?") ":" (or ?line "?") "] "
+           (clojure.string/upper-case (name level))" - "
+           (clojure.string/join " " vargs)
+           (when-let [err ?err]
+             (str "\n" (log/stacktrace err {}))))))})
