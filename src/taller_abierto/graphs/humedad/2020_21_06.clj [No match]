@@ -75,8 +75,8 @@ collection is rotated right. Executes in O(n) time."
           [x y z] (rotate voice-index [:x :y :z])]
       (o/ctl synth :amp (lorentz/bound l-val x 4 8))
       (o/ctl synth :bpf (lorentz/bound l-val y 30 4000))
-      (o/ctl synth :rq (lorentz/bound l-val z 0.1 0.3)
-             (o/ctl synth :room (lorentz/bound l-val z 0 1)))
+      (o/ctl synth :rq (lorentz/bound l-val z 0.1 0.3))
+      (o/ctl synth :room (lorentz/bound l-val z 0 1))
       #_(o/ctl synth :rate (lorentz/bound l-val z 0.3 2))
       (o/ctl synth :pan (lorentz/bound l-val :x -1 1))
       (swap! lor-state assoc voice-index (assoc l-val :x x :y y :z z)))
